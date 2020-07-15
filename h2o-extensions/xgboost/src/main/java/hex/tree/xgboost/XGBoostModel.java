@@ -12,8 +12,12 @@ import hex.genmodel.algos.xgboost.XGBoostMojoModel;
 import hex.genmodel.utils.DistributionFamily;
 import hex.tree.PlattScalingHelper;
 import hex.tree.xgboost.predict.*;
+import hex.tree.xgboost.util.BoosterHelper;
 import hex.tree.xgboost.util.PredictConfiguration;
 import hex.util.EffectiveParametersUtils;
+import hex.util.LinearAlgebraUtils;
+import ml.dmlc.xgboost4j.java.Booster;
+import hex.tree.xgboost.predict.PredictorFactory;
 import org.apache.log4j.Logger;
 import water.*;
 import water.codegen.CodeGeneratorPipeline;
@@ -23,7 +27,11 @@ import water.util.ArrayUtils;
 import water.util.JCodeGen;
 import water.util.SBPrintStream;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static hex.genmodel.algos.xgboost.XGBoostMojoModel.ObjectiveType;
@@ -229,7 +237,7 @@ public class XGBoostModel extends Model<XGBoostModel, XGBoostModel.XGBoostParame
   public void initActualParamValues() {
     super.initActualParamValues();
     EffectiveParametersUtils.initFoldAssignment(_parms);
-    _parms._backend = getActualBackend(_parms);
+    _parms._backend = getActualBackend(_parms, true);
     _parms._tree_method = getActualTreeMethod(_parms);
   }
 
@@ -264,23 +272,24 @@ public class XGBoostModel extends Model<XGBoostModel, XGBoostModel.XGBoostParame
     _parms._dmatrix_type = _output._sparse ? XGBoostModel.XGBoostParameters.DMatrixType.sparse : XGBoostModel.XGBoostParameters.DMatrixType.dense;
   }
 
-  public static XGBoostParameters.Backend getActualBackend(XGBoostParameters p) {
+  public static XGBoostParameters.Backend getActualBackend(XGBoostParameters p, boolean verbose) {
+    Consumer<String> log = verbose ? LOG::info : LOG::debug;
     if ( p._backend == XGBoostParameters.Backend.auto || p._backend == XGBoostParameters.Backend.gpu ) {
-      if (H2O.getCloudSize() > 1 && !p._build_tree_one_node) {
-        LOG.info("GPU backend not supported in distributed mode. Using CPU backend.");
+      if (H2O.getCloudSize() > 1) {
+        log.accept("GPU backend not supported in distributed mode. Using CPU backend.");
         return XGBoostParameters.Backend.cpu;
       } else if (! p.gpuIncompatibleParams().isEmpty()) {
-        LOG.info("GPU backend not supported for the choice of parameters (" + p.gpuIncompatibleParams() + "). Using CPU backend.");
+        log.accept("GPU backend not supported for the choice of parameters (" + p.gpuIncompatibleParams() + "). Using CPU backend.");
         return XGBoostParameters.Backend.cpu;
       } else if (XGBoost.hasGPU(H2O.CLOUD.members()[0], p._gpu_id)) {
-        LOG.info("Using GPU backend (gpu_id: " + p._gpu_id + ").");
+        log.accept("Using GPU backend (gpu_id: " + p._gpu_id + ").");
         return XGBoostParameters.Backend.gpu;
       } else {
-        LOG.info("No GPU (gpu_id: " + p._gpu_id + ") found. Using CPU backend.");
+        log.accept("No GPU (gpu_id: " + p._gpu_id + ") found. Using CPU backend.");
         return XGBoostParameters.Backend.cpu;
       }
     } else {
-      LOG.info("Using CPU backend.");
+      log.accept("Using CPU backend.");
       return XGBoostParameters.Backend.cpu;
     }
   }
@@ -362,7 +371,7 @@ public class XGBoostModel extends Model<XGBoostModel, XGBoostModel.XGBoostParame
       params.put("one_drop", p._one_drop ? "1" : "0");
       params.put("skip_drop", p._skip_drop);
     }
-    XGBoostParameters.Backend actualBackend = getActualBackend(p);
+    XGBoostParameters.Backend actualBackend = getActualBackend(p, true);
     XGBoostParameters.TreeMethod actualTreeMethod = getActualTreeMethod(p);
     if (actualBackend == XGBoostParameters.Backend.gpu) {
       params.put("gpu_id", p._gpu_id);
@@ -755,6 +764,11 @@ public class XGBoostModel extends Model<XGBoostModel, XGBoostModel.XGBoostParame
       return false;
     }
     return featureIdx != -1 && _output._varimp._varimp[featureIdx] != 0d;
+  }
+
+  @Override
+  public ToEigenVec getToEigenVec() {
+    return LinearAlgebraUtils.toEigen;
   }
 
   //--------------------------------------------------------------------------------------------------------------------
