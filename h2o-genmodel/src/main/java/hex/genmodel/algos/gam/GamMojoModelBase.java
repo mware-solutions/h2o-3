@@ -11,7 +11,6 @@ import hex.genmodel.utils.ArrayUtils;
 import hex.genmodel.utils.DistributionFamily;
 import hex.genmodel.utils.LinkFunctionType;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -62,7 +61,7 @@ public abstract class GamMojoModelBase extends MojoModel implements ConverterFac
     super(columns, domains, responseColumn);
   }
 
-  void extractInputDataNames(String[] columnNames) {
+  void checkNamesContainsGamCols(String[] columnNames) {
     final List<String> names = Arrays.asList(columnNames);
     for (String gamColumnName : _gam_columns) {
       if (!names.contains(gamColumnName)) {
