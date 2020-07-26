@@ -11,6 +11,7 @@ import hex.genmodel.utils.ArrayUtils;
 import hex.genmodel.utils.DistributionFamily;
 import hex.genmodel.utils.LinkFunctionType;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -60,11 +61,12 @@ public abstract class GamMojoModelBase extends MojoModel implements ConverterFac
   GamMojoModelBase(String[] columns, String[][] domains, String responseColumn) {
     super(columns, domains, responseColumn);
   }
-
-  void checkNamesContainsGamCols(String[] columnNames) {
-    final List<String> names = Arrays.asList(columnNames);
-    for (String gamColumnName : _gam_columns) {
-      if (!names.contains(gamColumnName)) {
+  
+  @Override
+  public void checkNamesContainsGamCols(String[] cNames) {
+    final List<String> colHeaders = new ArrayList<>(Arrays.asList(cNames));
+    for (String gCol : _gam_columns) {
+      if (!colHeaders.contains(gCol)) {
         _inputContainGamCols = false;
         return;
       }
@@ -147,31 +149,30 @@ public abstract class GamMojoModelBase extends MojoModel implements ConverterFac
   }
   
   // this method will add to each data row the expanded gam columns
-  double[] addExpandGamCols(double[] rawData, final RowData rowData) { // add all expanded gam columns here
-    if (!_inputContainGamCols) {
-      // already contain gamified columns.  Nothing needs to be done.
-      return rawData;
-    }
-    // add expanded gam columns to rowData
-    int dataIndStart = _totFeatureSize - _numExpandedGamCols; // starting index to fill out the rawData
-    double[] dataWithGamifiedColumns = nanArray(getTotFeatureSize());
-    System.arraycopy(rawData, 0, dataWithGamifiedColumns, 0, dataIndStart);
-    for (int cind = 0; cind < _num_gam_columns; cind++) {
-      if (_bs[cind] == 0) { // to generate basis function values for cubic regression spline
-        Object dataObject = rowData.get(_gam_columns[cind]);
-        double gam_col_data = Double.NaN;
-        if (dataObject == null) {  // NaN, skip column gami
-          continue;
-        } else
-          gam_col_data = (dataObject instanceof String) ? Double.parseDouble((String) dataObject) : (double) dataObject;
-        GamUtilsCubicRegression.expandOneGamCol(gam_col_data, _binvD[cind], _basisVals[cind], _hj[cind], _knots[cind]);
-      } else {
-        throw new IllegalArgumentException("spline type not implemented!");
+  public double[] addExpandGamCols(double[] rawData, final RowData rowData) { // add all expanded gam columns here
+    if (_inputContainGamCols) { // perform gamification of columns
+      // add expanded gam columns to rowData
+      int dataIndStart = _totFeatureSize - _numExpandedGamCols; // starting index to fill out the rawData
+      double[] dataWithGamifiedColumns = nanArray(getTotFeatureSize());
+      System.arraycopy(rawData, 0, dataWithGamifiedColumns, 0, dataIndStart);
+      for (int cind = 0; cind < _num_gam_columns; cind++) {
+        if (_bs[cind] == 0) { // to generate basis function values for cubic regression spline
+          Object dataObject = rowData.get(_gam_columns[cind]);
+          double gam_col_data = Double.NaN;
+          if (dataObject == null) {  // NaN, skip column gami
+            continue;
+          } else
+            gam_col_data = (dataObject instanceof String) ? Double.parseDouble((String) dataObject) : (double) dataObject;
+          GamUtilsCubicRegression.expandOneGamCol(gam_col_data, _binvD[cind], _basisVals[cind], _hj[cind], _knots[cind]);
+        } else {
+          throw new IllegalArgumentException("spline type not implemented!");
+        }
+        System.arraycopy(_basisVals[cind], 0, dataWithGamifiedColumns, dataIndStart, _num_knots[cind]); // copy expanded gam to rawData
+        dataIndStart += _num_knots[cind]; 
       }
-      System.arraycopy(_basisVals[cind], 0, dataWithGamifiedColumns, dataIndStart, _num_knots[cind]); // copy expanded gam to rawData
-      dataIndStart += _num_knots[cind]; 
-    }
-    return dataWithGamifiedColumns;
+      return dataWithGamifiedColumns;
+    } else 
+      return rawData; // already contain gamified columns.  Nothing needs to be done.
   }
 
   @Override
