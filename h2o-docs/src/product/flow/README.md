@@ -1,219 +1,7 @@
-# Flow Web UI ...
-
->**Note**: This topic is no longer being maintained. Refer to the [Using Flow - H2O's Web UI](https://github.com/h2oai/h2o-3/blob/master/h2o-docs/src/product/flow.rst) topic for the most up-to-date documentation.
-
-H2O Flow is an open-source user interface for H2O. It is a web-based interactive environment that allows you to combine code execution, text, mathematics, plots, and rich media in a single document. 
-
-With H2O Flow, you can capture, rerun, annotate, present, and share your workflow. H2O Flow allows you to use H2O interactively to import files, build models, and iteratively improve them. Based on your models, you can make predictions and add rich text to create vignettes of your work - all within Flow's browser-based environment. 
-
-Flow's hybrid user interface seamlessly blends command-line computing with a modern graphical user interface. However, rather than displaying output as plain text, Flow provides a point-and-click user interface for every H2O operation. It allows you to access any H2O object in the form of well-organized tabular data. 
-
-H2O Flow sends commands to H2O as a sequence of executable cells. The cells can be modified, rearranged, or saved to a library. Each cell contains an input field that allows you to enter commands, define functions, call other functions, and access other cells or objects on the page. When you execute the cell, the output is a graphical object, which can be inspected to view additional details. 
-
-While H2O Flow supports REST API, R scripts, and CoffeeScript, no programming experience is required to run H2O Flow. You can click your way through any H2O operation without ever writing a single line of code. You can even disable the input cells to run H2O Flow using only the GUI. H2O Flow is designed to guide you every step of the way, by providing input prompts, interactive help, and example flows. 
-
-## Introduction
-
-This guide will walk you through how to use H2O's web UI, H2O Flow. To view a demo video of H2O Flow, click <a href="https://www.youtube.com/watch?feature=player_embedded&v=wzeuFfbW7WE" target="_blank">here</a>. 
-
-
----
-
-<a name="GetHelp"></a> 
-## Getting Help 
----
-
-First, let's go over the basics. Type `h` to view a list of helpful shortcuts. 
-
-The following help window displays: 
-
-![help menu](https://raw.githubusercontent.com/h2oai/h2o/master/docs/Flow-images/Shortcuts.png)
-
-To close this window, click the **X** in the upper-right corner, or click the **Close** button in the lower-right corner. You can also click behind the window to close it. You can also access this list of shortcuts by clicking the **Help** menu and selecting **Keyboard Shortcuts**. 
-
-For additional help, click **Help** > **Assist Me** or click the **Assist Me!** button in the row of buttons below the menus. 
-
-![Assist Me](images/Flow_AssistMeButton.png) 
-
-You can also type `assist` in a blank cell and press **Ctrl+Enter**. A list of common tasks displays to help you find the correct command. 
-
- ![Assist Me links](images/Flow_assist.png)
- 
-There are multiple resources to help you get started with Flow in the **Help** sidebar. 
-
->**Note**: To hide the sidebar, click the **>>** button above it. ![Flow - Hide Sidebar](images/Flow_SidebarHide.png)
->
->To display the sidebar if it is hidden, click the **<<** button. ![Flow - Hide Sidebar](images/Flow_SidebarDisplay.png)
-
-To access this documentation, select the **Flow Web UI...** link below the **General** heading in the Help sidebar. 
-
-You can also explore the pre-configured flows available in H2O Flow for a demonstration of how to create a flow. To view the example flows:
-
-- Click the **view example Flows** link below the **Quickstart Videos** button in the **Help** sidebar 
-  ![Flow - View Example Flows link](images/Flow_ViewExampleFlows.png)
- 
-   or 
-
-- Click the **Browse installed packs...** link in the **Packs** subsection of the **Help** sidebar. Click the **examples** folder and select the example flow from the list. 
-
-  ![Flow Packs](images/Flow_ExampleFlows.png)
-
-If you have a flow currently open, a confirmation window appears asking if the current notebook should be replaced. To load the example flow, click the **Load Notebook** button. 
-
-To view the REST API documentation, click the **Help** tab in the sidebar and then select the type of REST API documentation (**Routes** or **Schemas**). 
-
- ![REST API documentation](images/Flow_REST_docs.png)
-
-Before getting started with H2O Flow, make sure you understand the different cell modes. Certain actions can only be performed when the cell is in a specific mode. 
-
----
-
-<a name="Cell"></a>
-## Understanding Cell Modes
-
-There are two modes for cells: edit and command. 
-
-<a name="EditMode"></a>
-### Using Edit Mode
-In edit mode, the cell is yellow with a blinking bar to indicate where text can be entered and there is an orange flag to the left of the cell.
-
-
-![Edit Mode](images/Flow_EditMode.png)
- 
-<a name="CmdMode"></a>
-### Using Command Mode
- In command mode, the flag is yellow. The flag also indicates the cell's format: 
-
-- **MD**: Markdown 
-   
-   >**Note**: Markdown formatting is not applied until you run the cell by:
-   > 
-   >- clicking the **Run** button ![Flow - Run Button](images/Flow_RunButton.png)
-        > or
-      
-   >- pressing **Ctrl+Enter**
-
- ![Flow - Markdown](images/Flow_markdown.png)
-
-- **CS**: Code (default)
-
- ![Flow - Code](images/Flow_parse_code_ex.png)
-
-- **RAW**: Raw format (for code comments) 
-
- ![Flow - Raw](images/Flow_raw.png)
-
-- **H[1-6]**: Heading level (where 1 is a first-level heading) 
-
- ![Flow - Heading Levels](images/Flow_headinglevels.png)
-
->**NOTE**: If there is an error in the cell, the flag is red. 
-
- ![Cell error](images/Flow_redflag.png)
- 
- If the cell is executing commands, the flag is teal. The flag returns to yellow when the task is complete. 
- 
- ![Cell executing](images/Flow_cellmode_runningflag.png)
-
-### Changing Cell Formats
-
-To change the cell's format (for example, from code to Markdown), make sure you are in command (not edit) mode and that the cell you want to change is selected. The easiest way to do this is to click on the flag to the left of the cell. Enter the keyboard shortcut for the format you want to use. The flag's text changes to display the current format. 
-
-Cell Mode     | Keyboard Shortcut
-------------- | -----------------
-Code          | `y`
-Markdown      | `m`
-Raw text      | `r`
-Heading 1     | `1`
-Heading 2     | `2`
-Heading 3     | `3` 
-Heading 4     | `4` 
-Heading 5     | `5`
-Heading 6     | `6` 
-
-
-### Running Cells
-
-
-The series of buttons at the top of the page below the menus run cells in a flow. 
- 
- ![Flow - Run Buttons](images/Flow_RunButtons.png)
-
-- To run all cells in the flow, click the **Flow** menu, then click **Run All Cells**. 
-- To run the current cell and all subsequent cells, click the **Flow** menu, then click **Run All Cells Below**. 
-- To run an individual cell in a flow, confirm the cell is in [Edit Mode](#EditMode), then: 
-
- - press **Ctrl+Enter**
-
-     or
-  
- - click the **Run** button ![Flow - Run Button](images/Flow_RunButton.png)
-
-
-
-### Running Flows
-When you run the flow, a progress bar indicates the current status of the flow. You can cancel the currently running flow by clicking the **Stop** button in the progress bar. 
-
-  ![Flow Progress Bar](images/Flow_progressbar.png)
-
-When the flow is complete, a message displays in the upper right.
-
-  ![Flow - Completed Successfully](images/Flow_run_pass.png)
-  ![Flow - Did Not Complete](images/Flow_run_fail.png) 
- 
->**Note**: If there is an error in the flow, H2O Flow stops at the cell that contains the error. 
-
-
-### Using Keyboard Shortcuts
-
-Here are some important keyboard shortcuts to remember: 
-
-- Click a cell and press **Enter** to enter edit mode, which allows you to change the contents of a cell. 
-- To exit edit mode, press **Esc**. 
-- To execute the contents of a cell, press the **Ctrl** and **Enter** buttons at the same time.
-
-The following commands must be entered in [command mode](#CmdMode).  
-
-- To add a new cell *above* the current cell, press **a**. 
-- To add a new cell *below* the current cell, press **b**. 
-- To delete the current cell, press the **d** key *twice*. (**dd**). 
-
-You can view these shortcuts by clicking **Help** > **Keyboard Shortcuts** or by clicking the **Help** tab in the sidebar. 
-
-### Using Variables in Cells
-
-Variables can be used to store information such as download locations. To use a variable in Flow: 
-
-1. Define the variable in a code cell (for example, `locA = "https://h2o-public-test-data.s3.amazonaws.com/bigdata/laptop/kdd2009/small-churn/kdd_train.csv"`). 
-  ![Flow variable definition](images/Flow_VariableDefinition.png)
-2. Run the cell. H2O validates the variable. 
-  ![Flow variable validation](images/Flow_VariableValidation.png)
-3. Use the variable in another code cell (for example, `importFiles [locA]`). 
-  ![Flow variable example](images/Flow_VariableExample.png)
-To further simplify your workflow, you can save the cells containing the variables and definitions as [clips](#Clips). 
-
-
-### Using Flow Buttons
-There are also a series of buttons at the top of the page below the flow name that allow you to save the current flow, add a new cell, move cells up or down, run the current cell, and cut, copy, or paste the current cell. If you hover over the button, a description of the button's function displays. 
-
- ![Flow buttons](images/Flow_buttons.png)
- 
-You can also use the menus at the top of the screen to edit the order of the cells, toggle specific format types (such as input or output), create models, or score models. You can also access troubleshooting information or obtain help with Flow.  
- ![Flow menus](images/Flow_menus.png)
-
->**Note**: To disable the code input and use H2O Flow strictly as a GUI, click the **Cell** menu, then **Toggle Cell Input**. 
-
-Now that you are familiar with the cell modes, let's import some data. 
-
----
-
 <a name="ImportData"></a>
 # ... Importing Data
 
-If you don't have any data of your own to work with, you can find some example datasets at <a href="http://data.h2o.ai" target="_blank">http://data.h2o.ai</a>.
-
-
-There are multiple ways to import data in H2O flow:
+There are multiple ways to import data in Tetra flow:
 
 - Click the **Assist Me!** button in the row of buttons below the menus, then click the **importFiles** link. Enter the file path in the auto-completing **Search** entry field and press **Enter**. Select the file from the search results and confirm it by clicking the **Add All** link.
  ![Flow - Import Files Auto-Suggest](images/Flow_Import_AutoSuggest.png)
@@ -222,8 +10,6 @@ There are multiple ways to import data in H2O flow:
 
 >**Note**: For S3 file locations, use the format `importFiles [ "s3n:/path/to/bucket/file/file.tab.gz" ]`
   
-- For an example of how to import a single file or a directory in R, refer to the following [example](https://github.com/h2oai/h2o-2/blob/master/R/tests/testdir_hdfs/runit_s3n_basic.R).  
-
 After selecting the file to import, the file path displays in the "Search Results" section. To import a single file, click the plus sign next to the file. To import all files in the search results, click the **Add all** link. The files selected for import display in the "Selected Files" section. 
 ![Import Files](images/Flow_import.png)
 
@@ -252,7 +38,7 @@ To upload a local file, click the **Data** menu and select **Upload File...**. C
   
   ![File Upload Successful](images/Flow_FileUploadPass.png)
 
-Ok, now that your data is available in H2O Flow, let's move on to the next step: parsing. Click the **Parse these files** button to continue. 
+Ok, now that your data is available in Tetra Flow, let's move on to the next step: parsing. Click the **Parse these files** button to continue. 
 
 ---
 
@@ -267,7 +53,7 @@ The read-only **Sources** field displays the file path for the imported data sel
 
 The **ID** contains the auto-generated name for the parsed data (by default, the file name of the imported file with `.hex` as the file extension). Use the default name or enter a custom name in this field. 
 
-Select the parser type (if necessary) from the drop-down **Parser** list. For most data parsing, H2O automatically recognizes the data type, so the default settings typically do not need to be changed. The following options are available: 
+Select the parser type (if necessary) from the drop-down **Parser** list. For most data parsing, Tetra automatically recognizes the data type, so the default settings typically do not need to be changed. The following options are available: 
 
 - Auto
 - ARFF
@@ -308,7 +94,7 @@ To change the column type, select the drop-down list to the right of the column 
   - String
   - Invalid
 
-You can search for a column by entering it in the *Search by column name...* entry field above the first column name entry field. As you type, H2O displays the columns that match the specified search terms.
+You can search for a column by entering it in the *Search by column name...* entry field above the first column name entry field. As you type, Tetra displays the columns that match the specified search terms.
 
 **Note**: Only custom column names are searchable. Default column names cannot be searched. 
 
@@ -322,14 +108,14 @@ After you click the **Parse** button, the code for the current job displays.
 
  ![Flow - Parse code](images/Flow_parse_code_ex.png)
  
-Since we've submitted a couple of jobs (data import & parse) to H2O now, let's take a moment to learn more about jobs in H2O.  
+Since we've submitted a couple of jobs (data import & parse) to Tetra now, let's take a moment to learn more about jobs in Tetra.  
  
 --- 
  
 <a name="ViewJobs"></a>
 ## Viewing Jobs
 
-Any command (such as `importFiles`) you enter in H2O is submitted as a job, which is associated with a key. The key identifies the job within H2O and is used as a reference.
+Any command (such as `importFiles`) you enter in Tetra is submitted as a job, which is associated with a key. The key identifies the job within Tetra and is used as a reference.
 
 ### Viewing All Jobs
 
@@ -365,7 +151,7 @@ The following information displays:
 
 >**NOTE**: For a better understanding of how jobs work, make sure to review the [Viewing Frames](#ViewFrames) section as well. 
  
-Ok, now that you understand how to find jobs in H2O, let's submit a new one by building a model. 
+Ok, now that you understand how to find jobs in Tetra, let's submit a new one by building a model. 
 
 ---
 
@@ -421,7 +207,7 @@ In the **Build a Model** cell, select an algorithm from the drop-down menu:
 
 The available options vary depending on the selected model. If an option is only available for a specific model type, the model type is listed. If no model type is specified, the option is applicable to all model types. 
 
-- **model_id**: (Optional) Enter a custom name for the model to use as a reference. By default, H2O automatically generates an ID containing the model type (for example, `gbm-6f6bdc8b-ccbc-474a-b590-4579eea44596`). 
+- **model_id**: (Optional) Enter a custom name for the model to use as a reference. By default, Tetra automatically generates an ID containing the model type (for example, `gbm-6f6bdc8b-ccbc-474a-b590-4579eea44596`). 
 
 - **training_frame**: (Required) Select the dataset used to build the model. 
 
@@ -618,7 +404,7 @@ The available options vary depending on the selected model. If an option is only
 
 - **force\_load\_balance**: ([DL](#DL)) Check this checkbox to force extra load balancing to increase training speed for small datasets and use all cores. This option is selected by default. 
 
-- **single\_node\_mode**: ([DL](#DL)) Check this checkbox to force H2O to run on a single node for fine-tuning of model parameters. This option is not selected by default. 
+- **single\_node\_mode**: ([DL](#DL)) Check this checkbox to force Tetra to run on a single node for fine-tuning of model parameters. This option is not selected by default. 
 
 - **replicate\_training\_data**: ([DL](#DL)) Check this checkbox to replicate the entire training dataset on every node for faster training on small datasets. This option is not selected by default. This option is only applicable for clouds with more than one node. 
 
@@ -642,13 +428,13 @@ The available options vary depending on the selected model. If an option is only
 
 - **reproducible**: ([DL](#DL)) To force reproducibility on small data, check this checkbox. If this option is enabled, the model takes more time to generate, since it uses only one thread. 
 
-- **export\_weights\_and\_biases**: ([DL](#DL)) To export the neural network weights and biases as H2O frames, check this checkbox. 
+- **export\_weights\_and\_biases**: ([DL](#DL)) To export the neural network weights and biases as Tetra frames, check this checkbox. 
 
 - **max\_after\_balance\_size**: ([DRF](#DRF), [GBM](#GBM), [DL](#DL)) Specify the maximum relative size of the training data after balancing class counts (can be less than 1.0). Requires **balance\_classes**. 
 
 - **nbins\_top\_level**: ([DRF](#DRF), [GBM](#GBM)) (For numerical [real/int] columns only) Specify the maximum number of bins at the root level to use to build the histogram. This number will then be decreased by a factor of two per level.  
 
-- **seed**: ([K-Means](#Kmeans), [GLM](#GLM), [GBM](#GBM), [DL](#DL), [DRF](#DRF)) Specify the random number generator (RNG) seed for algorithm components dependent on randomization. The seed is consistent for each H2O instance so that you can create models with the same starting conditions in alternative configurations. 
+- **seed**: ([K-Means](#Kmeans), [GLM](#GLM), [GBM](#GBM), [DL](#DL), [DRF](#DRF)) Specify the random number generator (RNG) seed for algorithm components dependent on randomization. The seed is consistent for each Tetra instance so that you can create models with the same starting conditions in alternative configurations. 
 
 - **intercept**: ([GLM](#GLM)) To include a constant term in the model, check this checkbox. This option is selected by default. 
 
@@ -683,7 +469,7 @@ To inspect a model, check its checkbox then click the **Inspect** button, or cli
  
 To delete a model, click the **Delete** button. 
 
-To generate a Plain Old Java Object (POJO) that can use the model outside of H2O, click the **Download POJO** button. 
+To generate a Plain Old Java Object (POJO) that can use the model outside of Tetra, click the **Download POJO** button. 
 
 >**Note**: A POJO can be run in standalone mode or it can be integrated into a platform, such as [Hadoop's Storm](https://github.com/h2oai/h2o-training/blob/master/tutorials/streaming/storm/README.md). To make the POJO work in your Java application, you will also need the `h2o-genmodel.jar` file (available in `h2o-3/h2o-genmodel/build/libs/h2o-genmodel.jar`).
 
@@ -876,7 +662,7 @@ This screenshot displays the results of clicking the **columns** link.
 
 To view all frames, click the **Assist Me!** button, then click the **getFrames** link, or enter `getFrames` in the cell in CS mode and press **Ctrl+Enter**. You can also view all current frames by clicking the drop-down **Data** menu and selecting **List All Frames**. 
 
-A list of the current frames in H2O displays that includes the following information for each frame: 
+A list of the current frames in Tetra displays that includes the following information for each frame: 
 
 
 - Link to the frame (the "key")
@@ -907,7 +693,7 @@ Datasets can be split within Flow for use in model training and testing.
 2. From the drop-down **Frame:** list, select the frame to split. 
 3. In the second **Ratio** entry field, specify the fractional value to determine the split. The first **Ratio** field is automatically calculated based on the values entered in the second **Ratio** field. 
    
-  >**Note**: Only fractional values between 0 and 1 are supported (for example, enter `.5` to split the frame in half). The total sum of the ratio values must equal one. H2O automatically adjusts the ratio values to equal one; if unsupported values are entered, an error displays.  
+  >**Note**: Only fractional values between 0 and 1 are supported (for example, enter `.5` to split the frame in half). The total sum of the ratio values must equal one. Tetra automatically adjusts the ratio values to equal one; if unsupported values are entered, an error displays.  
 4. In the **Key** entry field, specify a name for the new frame. 
 5. (Optional) To add another split, click the **Add a split** link. To remove a split, click the `X` to the right of the **Key** entry field. 
 6. Click the **Create** button.  
@@ -943,7 +729,7 @@ Select one of the above options from the drop-down **Color** menu to display the
 
  ![Flow - Plotting Frames](images/Flow_plot.png)
 
->**Note**: Because H2O stores enums internally as numeric then maps the integers to an array of strings, any `min`, `max`, or `mean` values for categorical columns are not meaningful and should be ignored. Displays for categorical data will be modified in a future version of H2O. 
+>**Note**: Because Tetra stores enums internally as numeric then maps the integers to an array of strings, any `min`, `max`, or `mean` values for categorical columns are not meaningful and should be ignored. Displays for categorical data will be modified in a future version of Tetra. 
 
 ---
 
@@ -1019,19 +805,11 @@ By default, flows are saved to the `h2oflows` directory underneath your home dir
 
 To back up saved flows, copy this directory to your preferred backup location.  
 
-To specify a different location for saved flows, use the command-line argument `-flow_dir` when launching H2O:
+To specify a different location for saved flows, use the command-line argument `-flow_dir` when launching Tetra:
 
 `java -jar h2o.jar -flow_dir /<New>/<Location>/<For>/<Saved>/<Flows>`  
 
 where `/<New>/<Location>/<For>/<Saved>/<Flows>` represents the specified location.  If the directory does not exist, it will be created the first time you save a flow.
-
-### Saving Flows on a Hadoop cluster
-
-If you are running H2O Flow on a Hadoop cluster, H2O will try to find the HDFS home directory to use as the default directory for flows. If the HDFS home directory is not found, flows cannot be saved unless a directory is specified while launching using `-flow_dir`:
-
-`hadoop jar h2odriver.jar -nodes 1 -mapperXmx 6g -output hdfsOutputDirName -flow_dir hdfs:///<Saved>/<Flows>/<Location>`  
-
-The location specified in `flow_dir` may be either an hdfs or regular filesystem directory.  If the directory does not exist, it will be created the first time you save a flow.
 
 ### Copying Flows
 
@@ -1068,7 +846,7 @@ To load an exported flow, click the **Flow** menu and select **Open Flow...**. I
 
 To troubleshoot issues in Flow, use the **Admin** menu. The **Admin** menu allows you to check the status of the cluster, view a timeline of events, and view or download logs for issue analysis. 
 
->**NOTE**: To view the current H2O Flow version, click the **Help** menu, then click **About**. 
+>**NOTE**: To view the current Tetra Flow version, click the **Help** menu, then click **About**. 
 
 ## Viewing Cluster Status
 
@@ -1078,8 +856,8 @@ Click the **Admin** menu, then select **Cluster Status**. A summary of the statu
 - Whether all nodes can communicate (consensus)
 - Whether new nodes can join (locked/unlocked)
   
-  >**Note**: After you submit a job to H2O, the cluster does not accept new nodes. 
-- H2O version
+  >**Note**: After you submit a job to Tetra, the cluster does not accept new nodes. 
+- Tetra version
 - Number of used and available nodes
 - When the cluster was created
 
@@ -1182,29 +960,3 @@ If you experience an error with Flow, you can submit a JIRA ticket to notify our
 4. Attach the log file from the first step, write a description of the error you experienced, then click the **Create** button at the bottom of the page. Our team will work to resolve the issue and you can track the progress of your ticket in JIRA. 
 
 ---
-
-## Requesting Help
-
-If you have a Google account, you can submit a request for assistance with H2O on our Google Groups page, [H2Ostream](https://groups.google.com/forum/#!forum/h2ostream). 
-
-To access H2Ostream from Flow:
-
-0. Click the **Help** menu.
-0. Click **Forum/Ask a question**. 
-0. Click the red **New topic** button.
-0. Enter your question and click the red **Post** button. If you are requesting assistance for an error you experienced, be sure to include your [logs](#DL_Logs). 
-
-
-You can also email your question to [h2ostream@googlegroups.com](mailto:h2ostream@googlegroups.com). 
-
-Or, you can post your question on [Stack Overflow](https://stackoverflow.com/questions/tagged/h2o) using the "h2o" tag.
-
-
----
-
-## Shutting Down H2O
-
-To shut down H2O, click the **Admin** menu, then click **Shut Down**. A *Shut down complete* message displays in the upper right when the cluster has been shut down. 
-
----
-
