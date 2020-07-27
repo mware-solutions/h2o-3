@@ -1729,7 +1729,7 @@ final public class H2O {
    *  without unpacking the jar file and other startup stuff.  */
   private static void printAndLogVersion(String[] arguments) {
     Log.init(ARGS.log_level, ARGS.quiet, ARGS.max_log_file_size);
-    Log.info("----- H2O started " + (ARGS.client?"(client)":"") + " -----");
+    Log.info("----- Tetra started " + (ARGS.client?"(client)":"") + " -----");
     Log.info("Build git branch: " + ABV.branchName());
     Log.info("Build git hash: " + ABV.lastCommitHash());
     Log.info("Build git describe: " + ABV.describe());

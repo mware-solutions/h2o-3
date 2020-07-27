@@ -737,23 +737,23 @@ h2o.clusterInfo <- function() {
     res$build_age <- "PREHISTORIC"
   }
 
-  cat(paste0("R is connected to the H2O cluster", m))
-  cat("    H2O cluster uptime:        ", .readableTime(as.numeric(res$cloud_uptime_millis)), "\n")
-  cat("    H2O cluster timezone:      ", res$cloud_internal_timezone, "\n")
-  cat("    H2O data parsing timezone: ", res$datafile_parser_timezone, "\n")
-  cat("    H2O cluster version:       ", res$version, "\n")
-  cat("    H2O cluster version age:   ", res$build_age, if (res$build_too_old) "!!!" else "", "\n")
-  cat("    H2O cluster name:          ", res$cloud_name, "\n")
-  cat("    H2O cluster total nodes:   ", res$cloud_size, "\n")
-  cat("    H2O cluster total memory:  ", sprintf("%.2f GB", freeMem), "\n")
-  cat("    H2O cluster total cores:   ", numCPU, "\n")
-  cat("    H2O cluster allowed cores: ", allowedCPU, "\n")
-  cat("    H2O cluster healthy:       ", clusterHealth, "\n")
-  cat("    H2O Connection ip:         ", ip, "\n")
-  cat("    H2O Connection port:       ", port, "\n")
-  cat("    H2O Connection proxy:      ", proxy, "\n")
-  cat("    H2O Internal Security:     ", res$internal_security_enabled, "\n")
-  cat("    H2O API Extensions:        ", paste(extensions, collapse = ", "), "\n")
+  cat(paste0("R is connected to the Tetra cluster", m))
+  cat("    Tetra cluster uptime:        ", .readableTime(as.numeric(res$cloud_uptime_millis)), "\n")
+  cat("    Tetra cluster timezone:      ", res$cloud_internal_timezone, "\n")
+  cat("    Tetra data parsing timezone: ", res$datafile_parser_timezone, "\n")
+  cat("    Tetra cluster version:       ", res$version, "\n")
+  cat("    Tetra cluster version age:   ", res$build_age, if (res$build_too_old) "!!!" else "", "\n")
+  cat("    Tetra cluster name:          ", res$cloud_name, "\n")
+  cat("    Tetra cluster total nodes:   ", res$cloud_size, "\n")
+  cat("    Tetra cluster total memory:  ", sprintf("%.2f GB", freeMem), "\n")
+  cat("    Tetra cluster total cores:   ", numCPU, "\n")
+  cat("    Tetra cluster allowed cores: ", allowedCPU, "\n")
+  cat("    Tetra cluster healthy:       ", clusterHealth, "\n")
+  cat("    Tetra Connection ip:         ", ip, "\n")
+  cat("    Tetra Connection port:       ", port, "\n")
+  cat("    Tetra Connection proxy:      ", proxy, "\n")
+  cat("    Tetra Internal Security:     ", res$internal_security_enabled, "\n")
+  cat("    Tetra API Extensions:        ", paste(extensions, collapse = ", "), "\n")
   cat("    R Version:                 ", R.version.string, "\n")
 
   cpusLimited = sapply(nodeInfo, function(x) x[['num_cpus']] > 1L && x[['nthreads']] != 1L && x[['cpus_allowed']] == 1L)
@@ -761,7 +761,7 @@ h2o.clusterInfo <- function() {
     warning("Number of CPU cores allowed is limited to 1 on some nodes.\n",
             "To remove this limit, set environment variable 'OPENBLAS_MAIN_FREE=1' before starting R.")
   if (res$build_too_old) {
-    warning(sprintf("\nYour H2O cluster version is too old (%s)!\nPlease download and install the latest version from http://h2o.ai/download/", res$build_age))
+    warning(sprintf("\nYour Tetra cluster version is too old (%s)!", res$build_age))
   }
 }
 
