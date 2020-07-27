@@ -218,12 +218,6 @@ public class ServletUtils {
     response.setHeader("X-h2o-rest-api-version-max", Integer.toString(water.api.RequestServer.H2O_REST_API_VERSION));
     response.setHeader("X-h2o-cluster-id", Long.toString(H2O.CLUSTER_ID));
     response.setHeader("X-h2o-cluster-good", Boolean.toString(H2O.CLOUD.healthy()));
-    // Security headers
-    if (ENABLE_XFRAME_SAMEORIGIN) {
-      response.setHeader("X-Frame-Options", "sameorigin");
-    } else {
-      response.setHeader("X-Frame-Options", "deny");
-    }
     response.setHeader("X-XSS-Protection", "1; mode=block");
     response.setHeader("X-Content-Type-Options", "nosniff");
     response.setHeader("Content-Security-Policy", "default-src 'self' 'unsafe-eval' 'unsafe-inline'; img-src 'self' data:");
