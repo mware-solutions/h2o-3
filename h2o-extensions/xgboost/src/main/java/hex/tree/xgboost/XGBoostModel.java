@@ -12,11 +12,8 @@ import hex.genmodel.algos.xgboost.XGBoostMojoModel;
 import hex.genmodel.utils.DistributionFamily;
 import hex.tree.PlattScalingHelper;
 import hex.tree.xgboost.predict.*;
-import hex.tree.xgboost.util.BoosterHelper;
 import hex.tree.xgboost.util.PredictConfiguration;
 import hex.util.EffectiveParametersUtils;
-import ml.dmlc.xgboost4j.java.Booster;
-import hex.tree.xgboost.predict.PredictorFactory;
 import org.apache.log4j.Logger;
 import water.*;
 import water.codegen.CodeGeneratorPipeline;
@@ -26,18 +23,14 @@ import water.util.ArrayUtils;
 import water.util.JCodeGen;
 import water.util.SBPrintStream;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.*;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import static hex.genmodel.algos.xgboost.XGBoostMojoModel.ObjectiveType;
 import static hex.tree.xgboost.XGBoost.makeDataInfo;
 import static water.H2O.OptArgs.SYSTEM_PROP_PREFIX;
 
-public class XGBoostModel extends Model<XGBoostModel, XGBoostModel.XGBoostParameters, XGBoostOutput> 
+public class XGBoostModel extends Model<XGBoostModel, XGBoostModel.XGBoostParameters, XGBoostOutput>
         implements SharedTreeGraphConverter, Model.LeafNodeAssignment, Model.Contributions {
 
   private static final Logger LOG = Logger.getLogger(XGBoostModel.class);
@@ -128,7 +121,7 @@ public class XGBoostModel extends Model<XGBoostModel, XGBoostModel.XGBoostParame
     public DMatrixType _dmatrix_type = DMatrixType.auto;
     public float _reg_lambda = 1;
     public float _reg_alpha = 0;
-    
+
     // Platt scaling
     public boolean _calibrate_model;
     public Key<Frame> _calibration_frame;
@@ -160,7 +153,7 @@ public class XGBoostModel extends Model<XGBoostModel, XGBoostModel.XGBoostParame
       Map<String, Object> incompat = new HashMap<>();
       if (!(TreeMethod.auto == _tree_method || TreeMethod.hist == _tree_method) && Booster.gblinear != _booster) {
         incompat.put("tree_method", "Only auto and hist are supported tree_method on GPU backend.");
-      } 
+      }
       if (_max_depth > 15 || _max_depth < 1) {
         incompat.put("max_depth",  _max_depth + " . Max depth must be greater than 0 and lower than 16 for GPU backend.");
       }
@@ -208,8 +201,8 @@ public class XGBoostModel extends Model<XGBoostModel, XGBoostModel.XGBoostParame
       return this;
     }
 
-    static String[] CHECKPOINT_NON_MODIFIABLE_FIELDS = { 
-        "_tree_method", "_grow_policy", "_booster", "_sample_rate", "_max_depth", "_min_rows" 
+    static String[] CHECKPOINT_NON_MODIFIABLE_FIELDS = {
+            "_tree_method", "_grow_policy", "_booster", "_sample_rate", "_max_depth", "_min_rows"
     };
 
   }
@@ -236,7 +229,7 @@ public class XGBoostModel extends Model<XGBoostModel, XGBoostModel.XGBoostParame
   public void initActualParamValues() {
     super.initActualParamValues();
     EffectiveParametersUtils.initFoldAssignment(_parms);
-    _parms._backend = getActualBackend(_parms, true);
+    _parms._backend = getActualBackend(_parms);
     _parms._tree_method = getActualTreeMethod(_parms);
   }
 
@@ -270,29 +263,28 @@ public class XGBoostModel extends Model<XGBoostModel, XGBoostModel.XGBoostParame
     EffectiveParametersUtils.initDistribution(_parms, nclasses);
     _parms._dmatrix_type = _output._sparse ? XGBoostModel.XGBoostParameters.DMatrixType.sparse : XGBoostModel.XGBoostParameters.DMatrixType.dense;
   }
-  
-  public static XGBoostParameters.Backend getActualBackend(XGBoostParameters p, boolean verbose) {
-    Consumer<String> log = verbose ? LOG::info : LOG::debug;
+
+  public static XGBoostParameters.Backend getActualBackend(XGBoostParameters p) {
     if ( p._backend == XGBoostParameters.Backend.auto || p._backend == XGBoostParameters.Backend.gpu ) {
-      if (H2O.getCloudSize() > 1) {
-        log.accept("GPU backend not supported in distributed mode. Using CPU backend.");
+      if (H2O.getCloudSize() > 1 && !p._build_tree_one_node) {
+        LOG.info("GPU backend not supported in distributed mode. Using CPU backend.");
         return XGBoostParameters.Backend.cpu;
       } else if (! p.gpuIncompatibleParams().isEmpty()) {
-        log.accept("GPU backend not supported for the choice of parameters (" + p.gpuIncompatibleParams() + "). Using CPU backend.");
+        LOG.info("GPU backend not supported for the choice of parameters (" + p.gpuIncompatibleParams() + "). Using CPU backend.");
         return XGBoostParameters.Backend.cpu;
       } else if (XGBoost.hasGPU(H2O.CLOUD.members()[0], p._gpu_id)) {
-        log.accept("Using GPU backend (gpu_id: " + p._gpu_id + ").");
+        LOG.info("Using GPU backend (gpu_id: " + p._gpu_id + ").");
         return XGBoostParameters.Backend.gpu;
       } else {
-        log.accept("No GPU (gpu_id: " + p._gpu_id + ") found. Using CPU backend.");
+        LOG.info("No GPU (gpu_id: " + p._gpu_id + ") found. Using CPU backend.");
         return XGBoostParameters.Backend.cpu;
       }
     } else {
-      log.accept("Using CPU backend.");
+      LOG.info("Using CPU backend.");
       return XGBoostParameters.Backend.cpu;
     }
   }
-  
+
   public static Map<String, Object> createParamsMap(XGBoostParameters p, int nClasses, String[] coefNames) {
     Map<String, Object> params = new HashMap<>();
 
@@ -345,7 +337,7 @@ public class XGBoostModel extends Model<XGBoostModel, XGBoostModel.XGBoostParame
     }
     if (p._colsample_bynode != 1.0) {
       params.put("colsample_bynode", p._colsample_bynode);
-    }    
+    }
     if (p._max_delta_step != 0) {
       LOG.info("Using user-provided parameter max_delta_step instead of max_abs_leafnode_pred.");
       params.put("max_delta_step", p._max_delta_step);
@@ -370,13 +362,13 @@ public class XGBoostModel extends Model<XGBoostModel, XGBoostModel.XGBoostParame
       params.put("one_drop", p._one_drop ? "1" : "0");
       params.put("skip_drop", p._skip_drop);
     }
-    XGBoostParameters.Backend actualBackend = getActualBackend(p, true);
+    XGBoostParameters.Backend actualBackend = getActualBackend(p);
     XGBoostParameters.TreeMethod actualTreeMethod = getActualTreeMethod(p);
     if (actualBackend == XGBoostParameters.Backend.gpu) {
       params.put("gpu_id", p._gpu_id);
       // we are setting updater rather than tree_method here to keep CPU predictor, which is faster
       if (p._booster == XGBoostParameters.Booster.gblinear) {
-        LOG.info("Using gpu_coord_descent updater."); 
+        LOG.info("Using gpu_coord_descent updater.");
         params.put("updater", "gpu_coord_descent");
       } else {
         LOG.info("Using gpu_hist tree method.");
@@ -387,7 +379,7 @@ public class XGBoostModel extends Model<XGBoostModel, XGBoostModel.XGBoostParame
       LOG.info("Using coord_descent updater.");
       params.put("updater", "coord_descent");
     } else if (H2O.CLOUD.size() > 1 && p._tree_method == XGBoostParameters.TreeMethod.auto &&
-        p._monotone_constraints != null) {
+            p._monotone_constraints != null) {
       LOG.info("Using hist tree method for distributed computation with monotone_constraints.");
       params.put("tree_method", actualTreeMethod.toString());
       params.put("max_bin", p._max_bins);
@@ -490,7 +482,7 @@ public class XGBoostModel extends Model<XGBoostModel, XGBoostModel.XGBoostParame
     newModel._output._validation_metrics = null;
     return newModel;
   }
-  
+
   static int getMaxNThread() {
     if (System.getProperty(PROP_NTHREAD) != null) {
       return Integer.getInteger(PROP_NTHREAD);
@@ -597,7 +589,7 @@ public class XGBoostModel extends Model<XGBoostModel, XGBoostModel.XGBoostParame
   private XGBoostBigScorePredict setupBigScorePredictJava(DataInfo di) {
     return new XGBoostJavaBigScorePredict(model_info, _output, di, _parms, defaultThreshold());
   }
-  
+
   public XGBoostVariableImportance setupVarImp() {
     if (PredictConfiguration.useJavaScoring()) {
       return new XGBoostJavaVariableImportance(model_info);
@@ -628,7 +620,7 @@ public class XGBoostModel extends Model<XGBoostModel, XGBoostModel.XGBoostParame
 
   @Override
   public Frame scoreLeafNodeAssignment(
-      Frame frame, LeafNodeAssignmentType type, Key<Frame> destination_key
+          Frame frame, LeafNodeAssignmentType type, Key<Frame> destination_key
   ) {
     AssignLeafNodeTask task = AssignLeafNodeTask.make(model_info.scoringInfo(false), _output, model_info._boosterBytes, type);
     Frame adaptFrm = new Frame(frame);
@@ -660,7 +652,7 @@ public class XGBoostModel extends Model<XGBoostModel, XGBoostModel.XGBoostParame
   public SharedTreeGraph convert(final int treeNumber, final String treeClassName) {
     GradBooster booster = XGBoostJavaMojoModel.makePredictor(model_info._boosterBytes).getBooster();
     if (!(booster instanceof GBTree)) {
-      throw new IllegalArgumentException("XGBoost model is not backed by a tree-based booster. Booster class is " + 
+      throw new IllegalArgumentException("XGBoost model is not backed by a tree-based booster. Booster class is " +
               booster.getClass().getCanonicalName());
     }
 
@@ -708,7 +700,7 @@ public class XGBoostModel extends Model<XGBoostModel, XGBoostModel.XGBoostParame
       constructSubgraph(xgBoostNodes, sharedTreeSubgraph.makeLeftChildNode(sharedTreeNode),
               xgBoostNode.getLeftChildIndex(), sharedTreeSubgraph, featureProperties, xgBoostNode.default_left());
       constructSubgraph(xgBoostNodes, sharedTreeSubgraph.makeRightChildNode(sharedTreeNode),
-          xgBoostNode.getRightChildIndex(), sharedTreeSubgraph, featureProperties, !xgBoostNode.default_left());
+              xgBoostNode.getRightChildIndex(), sharedTreeSubgraph, featureProperties, !xgBoostNode.default_left());
     }
   }
 
@@ -780,10 +772,10 @@ public class XGBoostModel extends Model<XGBoostModel, XGBoostModel.XGBoostParame
     sb.ip("public int nclasses() { return ").p(_output.nclasses()).p("; }").nl();
     return sb;
   }
-  
+
   @Override
   protected void toJavaPredictBody(
-      SBPrintStream sb, CodeGeneratorPipeline classCtx, CodeGeneratorPipeline fileCtx, boolean verboseCode
+          SBPrintStream sb, CodeGeneratorPipeline classCtx, CodeGeneratorPipeline fileCtx, boolean verboseCode
   ) {
     final String namePrefix = JCodeGen.toJavaId(_key.toString());
     Predictor p = PredictorFactory.makePredictor(model_info._boosterBytes, false);
