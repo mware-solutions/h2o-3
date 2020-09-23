@@ -332,7 +332,7 @@ pfr <- function(x) { chk.H2OFrame(x); .pfr(x) }
 #' library(h2o)
 #' h2o.init()
 #' 
-#' f <- "http://h2o-public-test-data.s3.amazonaws.com/smalldata/iris/iris_train.csv"
+#' f <- "https://h2o-public-test-data.s3.amazonaws.com/smalldata/iris/iris_train.csv"
 #' iris <- h2o.importFile(f)
 #' h2o.getId(iris)
 #' }
@@ -348,7 +348,7 @@ h2o.getId <- function(x) attr( .eval.frame(x), "id")
 #' library(h2o)
 #' h2o.init()
 #' 
-#' f <- "http://h2o-public-test-data.s3.amazonaws.com/smalldata/iris/iris_train.csv"
+#' f <- "https://h2o-public-test-data.s3.amazonaws.com/smalldata/iris/iris_train.csv"
 #' iris <- h2o.importFile(f)
 #' h2o.getTypes(iris)
 #' }
@@ -580,7 +580,7 @@ h2o.interaction <- function(data, destination_frame, factors, pairwise, max_fact
 #' library(h2o)
 #' h2o.init()
 #' 
-#' f <- "http://h2o-public-test-data.s3.amazonaws.com/smalldata/iris/iris_train.csv"
+#' f <- "https://h2o-public-test-data.s3.amazonaws.com/smalldata/iris/iris_train.csv"
 #' iris <- h2o.importFile(f)
 #' h2o.rep_len(iris, length.out = 3)
 #' }
@@ -795,7 +795,7 @@ table.H2OFrame <- h2o.table
 #' library(h2o)
 #' h2o.init()
 #' 
-#' f <- "http://h2o-public-test-data.s3.amazonaws.com/smalldata/iris/iris_wheader.csv"
+#' f <- "https://h2o-public-test-data.s3.amazonaws.com/smalldata/iris/iris_wheader.csv"
 #' iris <- h2o.importFile(f)
 #' h2o.unique(iris["class"])
 #' }
@@ -2294,7 +2294,7 @@ is.numeric <- function(x) {
 #' library(h2o)
 #' h2o.init()
 #' 
-#' f <- "http://s3.amazonaws.com/h2o-public-test-data/smalldata/coxph_test/heart.csv"
+#' f <- "https://s3.amazonaws.com/h2o-public-test-data/smalldata/coxph_test/heart.csv"
 #' heart <- h2o.importFile(f)
 #' 
 #' heart["transplant"] <- as.character(heart["transplant"])
@@ -3006,7 +3006,7 @@ sd <- function(x, na.rm=FALSE) {
 #' library(h2o)
 #' h2o.init()
 #' 
-#' f <- "http://s3.amazonaws.com/h2o-public-test-data/smalldata/coxph_test/heart.csv"
+#' f <- "https://s3.amazonaws.com/h2o-public-test-data/smalldata/coxph_test/heart.csv"
 #' heart <- h2o.importFile(f)
 #' 
 #' h2o.signif(heart["age"], digits = 3)
@@ -3035,7 +3035,7 @@ signif <- function(x, digits=6) {
 #' library(h2o)
 #' h2o.init()
 #' 
-#' f <- "http://s3.amazonaws.com/h2o-public-test-data/smalldata/coxph_test/heart.csv"
+#' f <- "https://s3.amazonaws.com/h2o-public-test-data/smalldata/coxph_test/heart.csv"
 #' heart <- h2o.importFile(f)
 #' 
 #' h2o.round(heart["age"], digits = 3)
@@ -3256,7 +3256,7 @@ h2o.dimnames <- function(x) {
 #' library(h2o)
 #' h2o.init()
 #' 
-#' f <- "http://h2o-public-test-data.s3.amazonaws.com/smalldata/iris/iris_train.csv"
+#' f <- "https://h2o-public-test-data.s3.amazonaws.com/smalldata/iris/iris_train.csv"
 #' iris <- h2o.importFile(f)
 #' h2o.names(iris)
 #' }
@@ -3399,7 +3399,7 @@ h2o.asnumeric <- function(x) {
 #' library(h2o)
 #' h2o.init()
 #' 
-#' f <- "http://h2o-public-test-data.s3.amazonaws.com/smalldata/iris/iris_train.csv"
+#' f <- "https://h2o-public-test-data.s3.amazonaws.com/smalldata/iris/iris_train.csv"
 #' iris <- h2o.importFile(f)
 #' h2o.ascharacter(iris["species"])
 #' }
@@ -3418,7 +3418,7 @@ h2o.ascharacter <- function(x) {
 #' library()
 #' h2o.init()
 #' 
-#' f <- "http://h2o-public-test-data.s3.amazonaws.com/smalldata/iris/iris_train.csv"
+#' f <- "https://h2o-public-test-data.s3.amazonaws.com/smalldata/iris/iris_train.csv"
 #' iris <- h2o.importFile(f)
 #' h2o.print(iris["species"], n = 15)
 #' }
@@ -3685,7 +3685,7 @@ h2o.abs <- function(x) {
 #' library(h2o)
 #' h2o.init()
 #' 
-#' f <- "http://h2o-public-test-data.s3.amazonaws.com/smalldata/iris/iris_train.csv"
+#' f <- "https://h2o-public-test-data.s3.amazonaws.com/smalldata/iris/iris_train.csv"
 #' iris <- h2o.importFile(f)
 #' h2o.ceiling(iris[, 1])
 #' }
@@ -3759,7 +3759,7 @@ h2o.sum <- function(x, na.rm = FALSE, axis = 0, return_frame = FALSE) {
 #' library(h2o)
 #' h2o.init()
 #' 
-#' f <- "http://h2o-public-test-data.s3.amazonaws.com/smalldata/iris/iris_train.csv"
+#' f <- "https://h2o-public-test-data.s3.amazonaws.com/smalldata/iris/iris_train.csv"
 #' iris <- h2o.importFile(f)
 #' h2o.prod(iris["petal_len"])
 #' }
@@ -3882,7 +3882,7 @@ h2o.all <- function(x) {
 #' library(h2o)
 #' h2o.init()
 #' 
-#' f <- "http://h2o-public-test-data.s3.amazonaws.com/smalldata/iris/iris_train.csv"
+#' f <- "https://h2o-public-test-data.s3.amazonaws.com/smalldata/iris/iris_train.csv"
 #' iris <- h2o.importFile(f)
 #' h2o.any(iris[, 1] < 1000)
 #' }
@@ -3903,7 +3903,7 @@ h2o.any <- function(x) {
 #' library(h2o)
 #' h2o.init()
 #' 
-#' f <- "http://h2o-public-test-data.s3.amazonaws.com/smalldata/iris/iris_train.csv"
+#' f <- "https://h2o-public-test-data.s3.amazonaws.com/smalldata/iris/iris_train.csv"
 #' iris <- h2o.importFile(f)
 #' h2o.min(iris["sepal_len"], na.rm = TRUE)
 #' }
@@ -3924,7 +3924,7 @@ h2o.min <- function(x,na.rm = FALSE) {
 #' library(h2o)
 #' h2o.init()
 #' 
-#' f <- "http://h2o-public-test-data.s3.amazonaws.com/smalldata/iris/iris_train.csv"
+#' f <- "https://h2o-public-test-data.s3.amazonaws.com/smalldata/iris/iris_train.csv"
 #' iris <- h2o.importFile(f)
 #' h2o.max(iris["petal_len"], na.rm = TRUE)
 #' }
@@ -3964,7 +3964,7 @@ h2o.nrow <- function(x) {
 #' library(h2o)
 #' h2o.init()
 #' 
-#' f <- "http://h2o-public-test-data.s3.amazonaws.com/smalldata/iris/iris_train.csv"
+#' f <- "https://h2o-public-test-data.s3.amazonaws.com/smalldata/iris/iris_train.csv"
 #' iris <- h2o.importFile(f)
 #' h2o.ncol(iris)
 #' }
@@ -3986,7 +3986,7 @@ h2o.ncol <- function(x) {
 #' library(h2o)
 #' h2o.init()
 #' 
-#' f <- "http://h2o-public-test-data.s3.amazonaws.com/smalldata/iris/iris_train.csv"
+#' f <- "https://h2o-public-test-data.s3.amazonaws.com/smalldata/iris/iris_train.csv"
 #' iris <- h2o.importFile(f)
 #' h2o.range(iris["petal_len"], na.rm = TRUE, finite = TRUE)
 #' }
@@ -4697,7 +4697,7 @@ h2o.merge <- function(x, y, by=intersect(names(x), names(y)), by.x=by, by.y=by, 
 #' library(h2o)
 #' h2o.init()
 #' 
-#' f <- "http://h2o-public-test-data.s3.amazonaws.com/smalldata/iris/iris_train.csv"
+#' f <- "https://h2o-public-test-data.s3.amazonaws.com/smalldata/iris/iris_train.csv"
 #' iris <- h2o.importFile(f)
 #' h2o.arrange(iris, "species","petal_len","petal_wid")
 #' }
@@ -4962,7 +4962,7 @@ h2o.relevel <- function(x,y) {
 #' \dontrun{
 #' library(h2o)
 #' h2o.init()
-#' df <- h2o.importFile("http://s3.amazonaws.com/h2o-public-test-data/smalldata/prostate/prostate.csv")
+#' df <- h2o.importFile("https://s3.amazonaws.com/h2o-public-test-data/smalldata/prostate/prostate.csv")
 #' h2o.group_by(data = df, by = "RACE", nrow("VOL"))
 #' }
 #' @export
@@ -5272,7 +5272,7 @@ apply <- function(X, MARGIN, FUN, ...) {
 #' library(h2o)
 #' h2o.init()
 #' 
-#' f <- "http://h2o-public-test-data.s3.amazonaws.com/smalldata/iris/iris_train.csv"
+#' f <- "https://h2o-public-test-data.s3.amazonaws.com/smalldata/iris/iris_train.csv"
 #' iris <- h2o.importFile(f)
 #' h2o.asnumeric(iris["petal_len"])
 #' h2o.hist(iris["petal_len"], breaks = "Sturges", plot = TRUE)
@@ -5343,8 +5343,8 @@ h2o.difflag1 <- function(object){
 #' @param max_cardinality Maximum cardinality of the iSAX word. Each word can have less than the max
 #' @param optimize_card An optimization flag that will find the max cardinality regardless of what is passed in for max_cardinality.
 #' @return An H2OFrame with the name of time series, string representation of iSAX word, followed by binary representation
-#' @references http://www.cs.ucr.edu/~eamonn/iSAX_2.0.pdf
-#' @references http://www.cs.ucr.edu/~eamonn/SAX.pdf
+#' @references https://www.cs.ucr.edu/~eamonn/iSAX_2.0.pdf
+#' @references https://www.cs.ucr.edu/~eamonn/SAX.pdf
 #' @examples 
 #' \dontrun{
 #' library(h2o)
