@@ -1,18 +1,20 @@
 package hex.grid;
 
 import hex.*;
-import hex.faulttolerance.Recoverable;
 import water.*;
 import water.api.schemas3.KeyV3;
 import water.fvec.Frame;
-import water.fvec.persist.PersistUtils;
+import water.persist.Persist;
 import water.util.*;
 import water.util.PojoUtils.FieldNaming;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.reflect.Array;
 import java.net.URI;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Objects;
 
 import static hex.grid.GridSearch.IGNORED_FIELDS_PARAM_HASH;
 
@@ -23,7 +25,7 @@ import static hex.grid.GridSearch.IGNORED_FIELDS_PARAM_HASH;
  *
  * @param <MP> type of model build parameters
  */
-public class Grid<MP extends Model.Parameters> extends Lockable<Grid<MP>> implements ModelContainer<Model>, Recoverable<Grid<MP>> {
+public class Grid<MP extends Model.Parameters> extends Lockable<Grid<MP>> implements ModelContainer<Model> {
 
   /**
    * Publicly available Grid prototype - used by REST API.
@@ -175,8 +177,8 @@ public class Grid<MP extends Model.Parameters> extends Lockable<Grid<MP>> implem
     super(key);
     _params = params != null ? (MP) params.clone() : null;
     _hyper_names = hyperNames;
-      _field_naming_strategy = fieldNaming;
-      _failures = new IcedHashMap<>();
+    _field_naming_strategy = fieldNaming;
+    _failures = new IcedHashMap<>();
   }
 
   /**
@@ -266,15 +268,15 @@ public class Grid<MP extends Model.Parameters> extends Lockable<Grid<MP>> implem
    */
   private void appendFailedModelParameters(final Key<Model> modelKey, final MP params, final String[] rawParams,
                                            final Throwable t) {
-      final String failureDetails = isJobCanceled(t) ? "Job Canceled" : t.getMessage();
-      final String stackTrace = StringUtils.toString(t);
-      final Key<Model> searchedKey = modelKey != null ? modelKey : NO_MODEL_FAILURES_KEY;
-      SearchFailure searchFailure = _failures.get(searchedKey);
-      if ((searchFailure == null)) {
-        searchFailure = new SearchFailure(_params.getClass());
-          _failures.put(searchedKey, searchFailure);
-      }
-      searchFailure.appendFailedModelParameters(params, rawParams, failureDetails, stackTrace);
+    final String failureDetails = isJobCanceled(t) ? "Job Canceled" : t.getMessage();
+    final String stackTrace = StringUtils.toString(t);
+    final Key<Model> searchedKey = modelKey != null ? modelKey : NO_MODEL_FAILURES_KEY;
+    SearchFailure searchFailure = _failures.get(searchedKey);
+    if ((searchFailure == null)) {
+      searchFailure = new SearchFailure(_params.getClass());
+      _failures.put(searchedKey, searchFailure);
+    }
+    searchFailure.appendFailedModelParameters(params, rawParams, failureDetails, stackTrace);
   }
 
   private static boolean isJobCanceled(final Throwable t) {
@@ -509,16 +511,19 @@ public class Grid<MP extends Model.Parameters> extends Lockable<Grid<MP>> implem
    * Exports this Grid in a binary format using {@link AutoBuffer}. Related models are not saved.
    *
    * @param gridExportDir Full path to the folder this {@link Grid} should be saved to
-   * @return Path of the file written
    * @throws IOException Error serializing the grid.
    */
-  public String exportBinary(final String gridExportDir) {
+  public void exportBinary(final String gridExportDir) throws IOException {
     Objects.requireNonNull(gridExportDir);
+    final String gridFilePath = gridExportDir + "/" + _key.toString();
     assert _key != null;
-    final String gridFilePath = gridExportDir + "/" + _key;
     final URI gridUri = FileUtils.getURI(gridFilePath);
-    PersistUtils.write(gridUri, this::writeWithoutModels);
-    return gridFilePath;
+    final Persist persist = H2O.getPM().getPersistForURI(gridUri);
+    try (final OutputStream outputStream = persist.create(gridUri.toString(), true)) {
+      final AutoBuffer autoBuffer = new AutoBuffer(outputStream, true);
+      writeWithoutModels(autoBuffer);
+      autoBuffer.close();
+    }
   }
 
   /**
@@ -527,33 +532,14 @@ public class Grid<MP extends Model.Parameters> extends Lockable<Grid<MP>> implem
    * @param exportDir Directory to export all the models to.
    * @throws IOException Error exporting the models
    */
-  public void exportModelsBinary(final String exportDir, ModelExportOptions... options) throws IOException {
+  public void exportModelsBinary(final String exportDir, ModelExportOption... options) throws IOException {
     Objects.requireNonNull(exportDir);
     for (Model model : getModels()) {
       model.exportBinaryModel(exportDir + "/" + model._key.toString(), true, options);
     }
   }
 
-  /**
-   * Imports models referenced by this grid from given directory.
-   *
-   * @param exportDir Directory to import the models from.
-   * @throws IOException Error importing the models
-   */
-  public void importModelsBinary(final String exportDir) throws IOException {
-    for (Key<Model> k : _models.values()) {
-      final Model<?, ?, ?> model = Model.importBinaryModel(exportDir + "/" + k.toString());
-      assert model != null;
-    }
-  }
-
-  @Override
-  public Set<Key<?>> getDependentKeys() {
-    return _params.getDependentKeys();
-  }
-
   public MP getParams() {
     return _params;
   }
-
 }
