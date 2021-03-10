@@ -35,7 +35,6 @@ class H2OJob(object):
         self.status = job["status"]
         self.job_key = job["key"]["name"]
         self.dest_key = job["dest"]["name"]
-        self.auto_recoverable = job["auto_recoverable"]
         self.job_poll_success = False
         self.warnings = None
         self.progress = 0
@@ -94,7 +93,7 @@ class H2OJob(object):
     def cancel(self):
         h2o.api("POST /3/Jobs/%s/cancel" % self.job_key)
         self.status = "CANCELLED"
-    
+
     def _query_job_status_safe(self):
         result = None
         attempts = 0
@@ -108,13 +107,9 @@ class H2OJob(object):
             except (H2OConnectionError, H2OResponseError, H2OServerError) as e:
                 last_err = e
                 if self.job_poll_success:
-                    if self.auto_recoverable:
-                        print("Job request failed %s, waiting for cluster to restart." % e.args[0])
-                        time.sleep(10)
-                    else:
-                        # general/unknown failure - might be due to a temporary issue on the cluster (eg. a heavy load)
-                        print("Job request failed %s, will retry after 3s." % e.args[0])
-                        time.sleep(3)
+                    # general/unknown failure - might be due to a temporary issue on the cluster (eg. a heavy load)
+                    print("Job request failed %s, will retry after 3s." % e.args[0])
+                    time.sleep(3)
                 else:
                     raise e
         if result:
