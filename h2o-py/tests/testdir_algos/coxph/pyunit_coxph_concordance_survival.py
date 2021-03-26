@@ -38,12 +38,9 @@ def with_strata(rossi):
 # expected (the first line with time=0 and values = 0)
 # When tests are run at CI wyth Python version 2.x and old lifelines, lifelines result contains one more line then
 def fix_py_result_for_older_lifelines(df):
-    one_more_line = 50 == len(df.index)
+    one_more_line = 49 == len(df.index)
     if one_more_line:
-        print("droping first line")
-        return df.drop(df.index[0:1]).reset_index( drop=True)
-    else:
-        return df
+        df.drop(df.head(1).index, inplace=True)
 
 
 def check_cox(rossi, x, stratify_by, formula):
@@ -61,14 +58,14 @@ def check_cox(rossi, x, stratify_by, formula):
 
     for col in stratify_by:
         rossi_h2o[col] = rossi_h2o[col].asfactor()
-    
+
     cph_h2o = H2OCoxProportionalHazardsEstimator(stop_column="week", stratify_by=stratify_by)
     cph_h2o.train(x=x, y="arrest", training_frame=rossi_h2o)
-    
+
     assert cph_h2o.model_id != ""
     assert cph_h2o.model_id != ""
     assert cph_h2o.formula() == formula, "Expected formula to be '" + formula + "' but it was " + cph_h2o.formula()
-    
+
     predH2O = cph_h2o.predict(test_data=rossi_h2o)
     assert len(predH2O) == len(rossi)
     metrics_h2o = cph_h2o.model_performance(rossi_h2o)
@@ -78,42 +75,42 @@ def check_cox(rossi, x, stratify_by, formula):
     hazard_h2o_as_pandas = hazard_h2o.as_data_frame(use_pandas=True)
 
     hazard_py = cph_py.baseline_hazard_
-    
+
     for col_name in hazard_py.columns:
         hazard_py.rename(columns={col_name: str(col_name)}, inplace=True)
-
-    hazard_py_reordered_columns = hazard_py.reset_index(drop=True).sort_index(axis=1)
-    hazard_h2o_reordered_columns = hazard_h2o_as_pandas.drop('t', axis="columns").reset_index( drop=True).sort_index(axis=1)
-
-    hazard_py_reordered_columns = fix_py_result_for_older_lifelines(hazard_py_reordered_columns)
 
     print("h2o:")
     print(hazard_h2o_as_pandas.reset_index(drop=True))
 
     print("lifelines:")
-    print(hazard_py_reordered_columns.reset_index(drop=True)) 
-    
-    assert_frame_equal(hazard_py_reordered_columns, hazard_h2o_reordered_columns, 
+    print(hazard_py.reset_index(drop=True))
+
+    hazard_py_reordered_columns = hazard_py.reset_index(drop=True).sort_index(axis=1)
+    hazard_h2o_reordered_columns = hazard_h2o_as_pandas.drop('t', axis="columns").reset_index( drop=True).sort_index(axis=1)
+
+    fix_py_result_for_older_lifelines(hazard_py_reordered_columns)
+
+    assert_frame_equal(hazard_py_reordered_columns, hazard_h2o_reordered_columns,
                        check_dtype=False, check_index_type=False, check_column_type=False)
-    
+
     survival_h2o = h2o.get_frame(cph_h2o._model_json['output']['baseline_survival']['name'])
     survival_h2o_as_pandas = survival_h2o.as_data_frame(use_pandas=True)
 
     survival_py = cph_py.baseline_survival_
-    
+
     for col_name in survival_py.columns:
         survival_py.rename(columns={col_name: str(col_name)}, inplace=True)
 
     survival_py_reordered_columns = survival_py.reset_index(drop=True).sort_index(axis=1)
     survival_h2o_reordered_columns = survival_h2o_as_pandas.drop('t', axis="columns").reset_index( drop=True).sort_index(axis=1)
 
-    survival_py_reordered_columns = fix_py_result_for_older_lifelines(survival_py_reordered_columns)
-    
+    fix_py_result_for_older_lifelines(survival_py_reordered_columns)
+
     print("h2o:")
     print(survival_h2o_as_pandas.reset_index(drop=True))
 
     print("lifelines:")
-    print(survival_py_reordered_columns.reset_index(drop=True))
+    print(survival_py.reset_index(drop=True))
 
     assert_frame_equal(survival_py_reordered_columns, survival_h2o_reordered_columns,
                        check_dtype=False, check_index_type=False, check_column_type=False)
