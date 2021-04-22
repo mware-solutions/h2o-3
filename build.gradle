@@ -132,11 +132,9 @@ ext {
     ]
 
     rProjects = [
-      project(':h2o-r')
     ]
 
     pythonProjects = [
-      project(':h2o-py')
     ]
 
     // The project which need to be run under CI only
